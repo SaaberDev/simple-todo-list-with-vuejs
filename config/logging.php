@@ -126,6 +126,13 @@ return [
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
+
+        'abuse' => [
+            'driver' => 'single',
+            'tap' => [\App\Logging\SimpleFormatter::class],
+            'path' => storage_path('logs/abuse.log'),
+            'level' => env('LOG_LEVEL', 'debug')
+        ]
     ],
 
 ];
