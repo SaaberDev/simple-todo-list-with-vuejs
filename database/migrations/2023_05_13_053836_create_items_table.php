@@ -16,7 +16,8 @@ return new class extends Migration
             $table->foreignId('user_id')->index()->constrained()->cascadeOnDelete();
             $table->string('title');
 //            $table->tinyInteger('position');
-            $table->tinyInteger('completed_at')->comment('(0) = Incomplete, (1) = Complete ');
+            $table->date('completed_at')
+                ->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

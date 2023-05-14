@@ -25,13 +25,11 @@ Route::get('/', function () {
 |--------------------------------------------------------------------------
 */
 Route::prefix('/my-todo-list')
-    ->name('my_todo_list')
+    ->name('my_todo_list.')
     ->middleware(['auth', 'verified'])
     ->group(function () {
-        Route::get('/', function () {
-            return view('my-todo-list');
-        });
-
+        Route::get('/', [ItemController::class, 'index'])->name('index');
+        Route::get('/items', [ItemController::class, 'items'])->name('items');
         Route::post('/store', [ItemController::class, 'store'])->name('store');
         Route::get('/edit', [ItemController::class, 'edit'])->name('edit');
         Route::patch('/update', [ItemController::class, 'update'])->name('update');

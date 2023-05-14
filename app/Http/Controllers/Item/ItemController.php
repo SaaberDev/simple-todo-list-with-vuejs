@@ -9,9 +9,21 @@ use Illuminate\Http\Request;
 
 class ItemController extends Controller
 {
-    /**
-     * Store a newly created resource in storage.
-     */
+    public function index()
+    {
+        return view('my-todo-list');
+    }
+
+    public function items()
+    {
+        $data = Item::orderByRaw('ISNULL(completed_at), completed_at ASC')->paginate(5);
+//        $data = Item::orderBy('created_at')->paginate(5);
+        return response()->json([
+            'message' => 'success',
+            'response' => $data
+        ]);
+    }
+
     public function store(ItemRequest $request)
     {
         try {
@@ -31,25 +43,19 @@ class ItemController extends Controller
         }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+
     public function edit(string $id)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+
     public function update(Request $request, string $id)
     {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+
     public function destroy(string $id)
     {
         //
