@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Item\ItemController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -18,9 +19,28 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+/*
+|--------------------------------------------------------------------------
+| Todo List Routes
+|--------------------------------------------------------------------------
+*/
+Route::prefix('/my-todo-list')
+    ->name('my_todo_list')
+    ->middleware(['auth', 'verified'])
+    ->group(function () {
+        Route::get('/', function () {
+            return view('my-todo-list');
+        });
+
+        Route::post('/store', [ItemController::class, 'store'])->name('store');
+        Route::get('/edit', [ItemController::class, 'edit'])->name('edit');
+        Route::patch('/update', [ItemController::class, 'update'])->name('update');
+        Route::delete('/destroy', [ItemController::class, 'destroy'])->name('destroy');
+        Route::post('/restore', [ItemController::class, 'restore'])->name('restore');
+        Route::post('/archived', [ItemController::class, 'archived'])->name('archived');
+        Route::post('/completed', [ItemController::class, 'completed'])->name('completed');
+        Route::post('/markAsDone', [ItemController::class, 'markAsDone'])->name('markAsDone');
+    });
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -28,4 +48,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
