@@ -16,8 +16,7 @@ class ItemController extends Controller
 
     public function items()
     {
-        $data = Item::orderByRaw('ISNULL(completed_at), completed_at ASC')->paginate(5);
-//        $data = Item::orderBy('created_at')->paginate(5);
+        $data = Item::orderBy('created_at')->paginate(5);
         return response()->json([
             'message' => 'success',
             'response' => $data
@@ -38,7 +37,7 @@ class ItemController extends Controller
             \DB::rollBack();
             reportLog($exception);
             return response()->json([
-                'msg' => 'Oops, Something Went Wrong!'
+                'message' => 'Oops, Something Went Wrong!'
             ]);
         }
     }
@@ -52,21 +51,21 @@ class ItemController extends Controller
 
     public function update(Request $request, string $id)
     {
-        //
+        $item = Item::findOrFail($id);
     }
 
 
     public function destroy(string $id)
     {
-        //
+        $item = Item::findOrFail($id);
     }
 
-    public function restore()
+    public function restore(string $id)
     {
-
+        $item = Item::findOrFail($id);
     }
 
-    public function archived()
+    public function archived(string $id)
     {
 
     }
@@ -76,8 +75,32 @@ class ItemController extends Controller
 
     }
 
-    public function markAsDone()
+    public function markAsDone(Request $request, string $id)
     {
-
+        $item = Item::findOrFail($id);
+        $is_completed = $request->input('is_completed');
+        if ($is_completed) {
+            try {
+                \DB::beginTransaction();
+                $item->update([
+                    'created_at' => now()
+                ]);
+                \DB::commit();
+                return response()->json([
+                    'message' => 'Task Completed.'
+                ]);
+            } catch (\Exception $exception) {
+                \DB::rollBack();
+                reportLog($exception);
+                return response()->json([
+                    'message' => 'Oops, Something Went Wrong!'
+                ]);
+            }
+        } else {
+            $item->update([
+                'created_at' => null
+            ]);
+        }
+        return response()->json();
     }
 }

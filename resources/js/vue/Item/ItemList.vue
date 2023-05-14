@@ -6,12 +6,10 @@
 </template>
 
 <script>
-import ArchiveBtn from "@/vue/Item/ArchiveBtn.vue";
 import Item from "@/vue/Item/Item.vue";
-import axios from "axios";
 
 export default {
-    components: {Item, ArchiveBtn},
+    components: {Item},
     props: ['items']
 }
 </script>

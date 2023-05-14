@@ -32,12 +32,12 @@ Route::prefix('/my-todo-list')
         Route::get('/items', [ItemController::class, 'items'])->name('items');
         Route::post('/store', [ItemController::class, 'store'])->name('store');
         Route::get('/edit', [ItemController::class, 'edit'])->name('edit');
-        Route::patch('/update', [ItemController::class, 'update'])->name('update');
+        Route::patch('/update/{id}', [ItemController::class, 'update'])->name('update');
         Route::delete('/destroy', [ItemController::class, 'destroy'])->name('destroy');
         Route::post('/restore', [ItemController::class, 'restore'])->name('restore');
         Route::post('/archived', [ItemController::class, 'archived'])->name('archived');
         Route::post('/completed', [ItemController::class, 'completed'])->name('completed');
-        Route::post('/markAsDone', [ItemController::class, 'markAsDone'])->name('markAsDone');
+        Route::post('/mark-as-done/{id}', [ItemController::class, 'markAsDone'])->name('markAsDone');
     });
 
 Route::middleware('auth')->group(function () {
