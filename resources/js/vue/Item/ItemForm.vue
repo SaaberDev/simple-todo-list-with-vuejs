@@ -23,20 +23,16 @@
     </div>
 
     <div class="text-left text-red-600"
-         :class="[[validationMessage ? '' : 'hidden'], [this.item.title == '' ? validationMessage = false : '']]"
+         :class="[(validationMessage ? '' : 'hidden'), (this.item.title == '' && validationMessage == false  ? validationMessage = false : '')]"
          v-text="this.errors.message"
     >
     </div>
 </template>
 
 <script>
-
-import axios from "axios";
-
 export default {
     data: function () {
         return {
-            exampleModalShowing: false,
             validationMessage: false,
             errors: {},
             item: {
@@ -46,19 +42,7 @@ export default {
     },
     methods: {
         add() {
-            // console.log(this.item)
-            axios.post('/my-todo-list/store', {
-                _token: csrfToken,
-                title: this.item.title
-            }).then(resp => {
-                if (resp.status == 201) {
-                    this.item.title = ''
-                }
-            }).catch(xhr => {
-                this.validationMessage = true
-                this.errors = xhr.response.data
-                // console.log(this.errors)
-            });
+            this.$emit('create-new-item', this.item)
         }
     }
 }

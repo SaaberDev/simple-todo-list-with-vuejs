@@ -6,26 +6,27 @@
                        class="h-6 w-6"
                        name="completed_at"
                        :value="1"
-                       :checked="this.isCompleted"
-                       v-model="this.isCompleted"
+                       :checked="this.itemData.isCompleted"
+                       v-model="this.itemData.isCompleted"
                        @change="completed"
                 />
             </div>
             <div class="p-2">
                 <p class="text-lg dark:text-gray-400"
-                   :class="[this.isCompleted ? 'line-through text-gray-400' : '']"
+                   :class="[this.itemData.isCompleted ? 'line-through text-gray-400' : '']"
                 >
                     {{ this.item.title }}
                 </p>
             </div>
-            <delete-btn></delete-btn>
+            <delete-btn :itemId="this.item.id"
+                        v-on:event-to-item="eventToItemList($event)"
+            ></delete-btn>
         </div>
         <hr class="mt-2"/>
     </li>
 </template>
 
 <script>
-import axios from "axios";
 import DeleteBtn from "@/vue/Item/DeleteBtn.vue";
 
 export default {
@@ -33,18 +34,18 @@ export default {
     props: ['item'],
     data: function () {
         return {
-            isCompleted: this.item.completed_at != null
+            itemData: {
+                id: this.item.id,
+                isCompleted: this.item.completed_at != null
+            }
         }
     },
     methods: {
         completed() {
-            axios.patch('/my-todo-list/mark-as-done/' + this.item.id, {
-                _token: csrfToken,
-                is_completed: this.isCompleted
-            }).catch(xhr => {
-                // this.errors = xhr.response.data
-                // console.log(this.errors)
-            });
+            this.$emit('mark-as-done', this.itemData)
+        },
+        eventToItemList: function (itemId) {
+            this.$emit('event-to-item-list', itemId)
         }
     }
 }

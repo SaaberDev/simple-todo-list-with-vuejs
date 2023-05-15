@@ -7,10 +7,10 @@ if (!function_exists('reportLog')) {
      */
     function reportLog($exception): void
     {
-        if (is_string($exception)) {
-            Log::channel('abuse')->info($exception);
+        if (is_string($exception) || is_array($exception)) {
+            Log::channel('abuse')->error($exception);
         }
 
-        Log::channel('abuse')->info($exception->getMessage());
+        Log::channel('abuse')->error($exception->getMessage());
     }
 }

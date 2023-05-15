@@ -14,9 +14,15 @@ class ItemController extends Controller
         return view('my-todo-list');
     }
 
-    public function items()
+    public function items(Request $request)
     {
-        $data = Item::orderBy('created_at')->paginate(5);
+        $data = Item::orderBy('created_at', 'desc')->paginate(5);
+
+        $param = $request->get('param');
+        if ($param === 'archived') {
+            $data = Item::onlyTrashed()->orderBy('created_at', 'desc')->paginate(5);
+        }
+
         return response()->json([
             'message' => 'success',
             'response' => $data
@@ -28,11 +34,14 @@ class ItemController extends Controller
         try {
             \DB::beginTransaction();
 
-            $request->validated();
-
-            Item::create();
+            $validated = $request->validated();
+            $validated['user_id'] = \Auth::user()->id;
+            Item::create($validated);
 
             \DB::commit();
+            return response()->json([
+                'message' => __('Item added successfully.'),
+            ]);
         } catch (\Exception $exception) {
             \DB::rollBack();
             reportLog($exception);
@@ -42,37 +51,69 @@ class ItemController extends Controller
         }
     }
 
-
-    public function edit(string $id)
-    {
-        //
-    }
-
-
-    public function update(Request $request, string $id)
+    public function update(ItemRequest $request, string $id)
     {
         $item = Item::findOrFail($id);
+        $validated = $request->validated();
+        try {
+            $item->update($validated);
+            return response()->json([
+                'message' => 'Item updated successfully.'
+            ]);
+        } catch (\Exception $exception) {
+            reportLog($exception);
+            return response()->json([
+                'message' => 'Oops, Something Went Wrong!'
+            ]);
+        }
     }
 
-
-    public function destroy(string $id)
+    public function archived(string $id)
     {
         $item = Item::findOrFail($id);
+        try {
+            $item->delete();
+            return response()->json([
+                'message' => 'Item has been archived.',
+            ]);
+        } catch (\Exception $exception) {
+            reportLog($exception);
+            return response()->json([
+                'message' => 'Oops, Something Went Wrong!'
+            ]);
+        }
     }
 
     public function restore(string $id)
     {
         $item = Item::findOrFail($id);
+        try {
+            $item->restore();
+            return response()->json([
+                'message' => 'Item has been restored.',
+            ]);
+        } catch (\Exception $exception) {
+            reportLog($exception);
+            return response()->json([
+                'message' => 'Oops, Something Went Wrong!'
+            ]);
+        }
     }
 
-    public function archived(string $id)
+    public function destroy(string $id)
     {
-
-    }
-
-    public function completed()
-    {
-
+        $item = Item::findOrFail($id);
+        try {
+            $item->forceDelete();
+            return response()->json([
+                'message' => 'Item has been permanently deleted.',
+            ]);
+        } catch (\Exception $exception) {
+            reportLog($exception);
+            return response()->json([
+                'message' => 'Oops, Something Went Wrong!'
+            ]);
+        }
     }
 
     public function markAsDone(Request $request, string $id)
@@ -81,26 +122,34 @@ class ItemController extends Controller
         $is_completed = $request->input('is_completed');
         if ($is_completed) {
             try {
-                \DB::beginTransaction();
                 $item->update([
-                    'created_at' => now()
+                    'completed_at' => now()
                 ]);
-                \DB::commit();
+
                 return response()->json([
-                    'message' => 'Task Completed.'
+                    'message' => 'Item marked as completed.'
                 ]);
             } catch (\Exception $exception) {
-                \DB::rollBack();
                 reportLog($exception);
                 return response()->json([
                     'message' => 'Oops, Something Went Wrong!'
                 ]);
             }
         } else {
-            $item->update([
-                'created_at' => null
-            ]);
+            try {
+                $item->update([
+                    'completed_at' => null
+                ]);
+
+                return response()->json([
+                    'message' => 'Item marked as incomplete.'
+                ]);
+            } catch (\Exception $exception) {
+                reportLog($exception);
+                return response()->json([
+                    'message' => 'Oops, Something Went Wrong!'
+                ]);
+            }
         }
-        return response()->json();
     }
 }

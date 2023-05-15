@@ -35,8 +35,7 @@ Route::prefix('/my-todo-list')
         Route::patch('/update/{id}', [ItemController::class, 'update'])->name('update');
         Route::delete('/destroy', [ItemController::class, 'destroy'])->name('destroy');
         Route::post('/restore', [ItemController::class, 'restore'])->name('restore');
-        Route::post('/archived', [ItemController::class, 'archived'])->name('archived');
-        Route::post('/completed', [ItemController::class, 'completed'])->name('completed');
+        Route::post('/archived/{id}', [ItemController::class, 'archived'])->name('archived');
         Route::post('/mark-as-done/{id}', [ItemController::class, 'markAsDone'])->name('markAsDone');
     });
 

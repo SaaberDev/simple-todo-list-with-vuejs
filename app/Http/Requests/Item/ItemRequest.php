@@ -22,8 +22,18 @@ class ItemRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'title' => 'required|numeric'
-        ];
+        switch ($this->method()) {
+            case 'GET':
+            case 'DELETE':
+                return [];
+            case 'PUT':
+            case 'PATCH':
+            case 'POST':
+                return [
+                    'title' => 'required'
+                ];
+            default:
+                break;
+        }
     }
 }
