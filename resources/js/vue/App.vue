@@ -24,7 +24,6 @@
         <div class="mt-8">
             <ul>
                 <item-list :items="items"
-                           v-on:archive-item="archiveItem($event)"
                 ></item-list>
             </ul>
         </div>
@@ -34,33 +33,38 @@
 <script>
 
 import axios from "axios";
-import ItemForm from "@/vue/Item/ItemForm.vue";
-import ItemList from "@/vue/Item/ItemList.vue";
+import ItemForm from "./Item/ItemForm.vue";
+import ItemList from "./Item/ItemList.vue";
 
 export default {
     components: {ItemForm, ItemList},
-    data: function () {
+    data() {
         return {
             items: [],
-            showArchivedList: false
+            showArchivedList: false,
+            param: ''
         }
     },
     methods: {
-        fetchItems(dataType) {
+        async fetchItems(dataType) {
             var URL = '/my-todo-list/items';
-            if (dataType == 'archived') {
-                URL = '/my-todo-list/items?param=archived';
+            if (dataType === 'archived') {
+                URL = '/my-todo-list?param=archived';
                 this.showArchivedList = true;
+                this.$router.push({path: URL, params: {param: dataType}})
+            } else {
+                this.showArchivedList = false;
             }
-            axios.get(URL).then(resp => {
+            await axios.get(URL).then(resp => {
                 this.items = resp.data.response.data
-                // console.log(this.items)
             }).catch(xhr => {
                 // console.log(xhr)
             });
+
+            return this.items;
         },
-        storeItem: function (item) {
-            axios.post('/my-todo-list/store', {
+        async storeItem(item) {
+            await axios.post('/my-todo-list/store', {
                 _token: csrfToken,
                 title: item.title
             }).then(resp => {
@@ -73,20 +77,19 @@ export default {
             }).catch(xhr => {
                 this.validationMessage = true
                 this.errors = xhr.response.data
-                // console.log(this.errors)
             });
-        },
-        archiveItem: function (itemId) {
-            axios.post('/my-todo-list/archived/' + itemId)
-                .then(resp => {
-                    // console.log(resp)
-                    $_toastAlert('warning', resp.data.message)
-                })
-            this.fetchItems();
         }
     },
     created() {
         this.fetchItems();
+
+        this.$bus.$on('archive-item', async (itemId) => {
+            await axios.post('/my-todo-list/archived/' + itemId)
+                .then(resp => {
+                    $_toastAlert('warning', resp.data.message)
+                })
+            await this.fetchItems();
+        });
     }
 }
 </script>

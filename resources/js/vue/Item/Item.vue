@@ -8,29 +8,29 @@
                        :value="1"
                        :checked="this.itemData.isCompleted"
                        v-model="this.itemData.isCompleted"
-                       @change="completed"
+                       @change="this.$emit('mark-as-done', this.itemData)"
                 />
             </div>
             <div class="p-2">
                 <p class="text-lg dark:text-gray-400"
                    :class="[this.itemData.isCompleted ? 'line-through text-gray-400' : '']"
+                   v-text="`${this.item.title}`"
                 >
-                    {{ this.item.title }}
                 </p>
             </div>
-            <delete-btn :itemId="this.item.id"
-                        v-on:event-to-item="eventToItemList($event)"
-            ></delete-btn>
+            <archive-btn :itemId="this.item.id"
+            ></archive-btn>
         </div>
         <hr class="mt-2"/>
     </li>
 </template>
 
 <script>
-import DeleteBtn from "@/vue/Item/DeleteBtn.vue";
+import DeleteBtn from "./ArchiveBtn.vue";
+import ArchiveBtn from "@/Item/ArchiveBtn.vue";
 
 export default {
-    components: {DeleteBtn},
+    components: {ArchiveBtn, DeleteBtn},
     props: ['item'],
     data: function () {
         return {
@@ -38,14 +38,6 @@ export default {
                 id: this.item.id,
                 isCompleted: this.item.completed_at != null
             }
-        }
-    },
-    methods: {
-        completed() {
-            this.$emit('mark-as-done', this.itemData)
-        },
-        eventToItemList: function (itemId) {
-            this.$emit('event-to-item-list', itemId)
         }
     }
 }

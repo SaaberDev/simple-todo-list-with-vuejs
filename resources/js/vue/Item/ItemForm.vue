@@ -9,7 +9,7 @@
         <button class="ml-2 border-2 border-green-500 p-2 <!--hover:text-white hover:bg-green-500--> rounded-lg flex"
                 :disabled="!item.title"
                 :class="[item.title ? 'text-green-500' : 'disabled:opacity-25' ]"
-                @click="add"
+                @click="this.$emit('create-new-item', this.item)"
         >
             <svg class="h-6 w-6" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                 <path stroke="none" d="M0 0h24v24H0z"/>
@@ -38,11 +38,6 @@ export default {
             item: {
                 title: ''
             }
-        }
-    },
-    methods: {
-        add() {
-            this.$emit('create-new-item', this.item)
         }
     }
 }

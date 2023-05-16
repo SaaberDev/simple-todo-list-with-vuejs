@@ -3,13 +3,12 @@
           :key="item.id"
           :item="item"
           v-on:mark-as-done="markAsDone($event)"
-          v-on:event-to-item-list="eventToParent($event)"
     ></item>
 </template>
 
 <script>
 import axios from "axios";
-import Item from "@/vue/Item/Item.vue";
+import Item from "./Item.vue";
 
 export default {
     components: {Item},
@@ -22,9 +21,6 @@ export default {
             }).then(resp => {
                 $_toastAlert('success', resp.data.message)
             });
-        },
-        eventToParent: function (itemId) {
-            this.$emit('archive-item', itemId);
         }
     }
 }
