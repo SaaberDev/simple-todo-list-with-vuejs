@@ -1,3 +1,15 @@
+<style>
+.btn {
+    @apply font-bold py-2 px-4 rounded;
+}
+.btn-blue {
+    @apply bg-blue-500 text-white;
+}
+.btn-blue:hover {
+    @apply bg-blue-700;
+}
+</style>
+
 <template>
     <div class="bg-white p-3 max-w-md mx-auto">
         <div class="ml-4 text-center">
@@ -8,8 +20,15 @@
 
         <div class="mt-8">
             <ul>
-                <item-list :items="items"></item-list>
+                <item-list :items="items" :key="this.componentKey"></item-list>
             </ul>
+
+            <div class="flex justify-between">
+                <button class="btn btn-blue" v-if="hasLess" @click="previous">Previous</button>
+                <button class="btn btn-blue" v-if="hasMore" @click="loadMore">Load More</button>
+
+                <p v-else>No more items to load.</p>
+            </div>
         </div>
     </div>
 </template>
@@ -30,19 +49,18 @@ export default {
     },
     data() {
         return {
-            items: []
+            items: [],
+            currentPage: 1,
+            perPage: 5,
+            hasMore: true,
+            hasLess: false,
         }
     },
     methods: {
         async fetchItems() {
-            var URL = '/my-todo-list';
-            await axios.get(URL).then(resp => {
-                this.items = resp.data.response.data
-            }).catch(xhr => {
-                // console.log(xhr)
+            await axios.get(`/my-todo-list?page=${this.currentPage}`).then(resp => {
+                this.items = resp.data.response;
             });
-
-            return this.items;
         },
         async storeItem(item) {
             await axios.post('/my-todo-list/store', {
@@ -60,6 +78,37 @@ export default {
                 item.validationMessage = true
                 item.errors = xhr.response.data
             });
+        },
+        async loadMore() {
+            try {
+                // increment the current page
+                this.currentPage++;
+                const response = await axios.get(`/my-todo-list?page=${this.currentPage}`);
+                this.items = response.data.response;
+
+                // check if page item length is equal to per page items
+                this.hasMore = this.items.length === this.perPage;
+                // check if current page is less than 1 to show previous button
+                this.hasLess = this.currentPage > 1;
+            } catch (error) {
+                console.error('Error loading more items', error);
+            }
+        },
+        async previous() {
+            try {
+                // decrement the current page
+                this.currentPage--;
+                const response = await axios.get(`/my-todo-list?page=${this.currentPage}`);
+                this.items = response.data.response;
+
+                // check if current page is less than 1 to hide previous button
+                this.hasLess = this.currentPage > 1;
+                // check if page item length is equal to per page items
+                // if true show load more button
+                this.hasMore = this.items.length === this.perPage;
+            } catch (error) {
+                console.error('Error loading items on previous', error);
+            }
         }
     },
     created() {

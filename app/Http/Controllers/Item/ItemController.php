@@ -13,7 +13,15 @@ class ItemController extends Controller
     public function index(Request $request)
     {
         if ($request->expectsJson()) {
-            $data = Item::orderBy('created_at', 'desc')->paginate(5);
+            $page = $request->get('page') ?? 1;
+            $perPage = 5;
+            $offset = $perPage * ($page - 1);
+            $data = Item::when($page)
+                ->orderBy('created_at', 'desc')
+                ->skip($offset)
+                ->take($perPage)
+                ->get()
+            ;
 
             return response()->json([
                 'message' => 'success',
