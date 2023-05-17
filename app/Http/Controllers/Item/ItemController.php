@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Item;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Item\ItemRequest;
+use App\Http\Requests\Item\StoreRequest;
+use App\Http\Requests\Item\UpdateRequest;
 use App\Models\Item;
 use Illuminate\Http\Request;
 
@@ -14,11 +15,6 @@ class ItemController extends Controller
         if ($request->expectsJson()) {
             $data = Item::orderBy('created_at', 'desc')->paginate(5);
 
-            $param = $request->get('param');
-            if ($param === 'archived') {
-                $data = Item::onlyTrashed()->orderBy('created_at', 'desc')->paginate(5);
-            }
-
             return response()->json([
                 'message' => 'success',
                 'response' => $data
@@ -28,7 +24,7 @@ class ItemController extends Controller
         }
     }
 
-    public function store(ItemRequest $request)
+    public function store(StoreRequest $request)
     {
         try {
             \DB::beginTransaction();
@@ -59,7 +55,7 @@ class ItemController extends Controller
         ]);
     }
 
-    public function update(ItemRequest $request, string $id)
+    public function update(UpdateRequest $request, string $id)
     {
         $item = Item::findOrFail($id);
         $validated = $request->validated();
@@ -67,38 +63,6 @@ class ItemController extends Controller
             $item->update($validated);
             return response()->json([
                 'message' => 'Item updated successfully.'
-            ]);
-        } catch (\Exception $exception) {
-            reportLog($exception);
-            return response()->json([
-                'message' => 'Oops, Something Went Wrong!'
-            ]);
-        }
-    }
-
-    public function archived(string $id)
-    {
-        $item = Item::findOrFail($id);
-        try {
-            $item->delete();
-            return response()->json([
-                'message' => 'Item has been archived.',
-            ]);
-        } catch (\Exception $exception) {
-            reportLog($exception);
-            return response()->json([
-                'message' => 'Oops, Something Went Wrong!'
-            ]);
-        }
-    }
-
-    public function restore(string $id)
-    {
-        $item = Item::findOrFail($id);
-        try {
-            $item->restore();
-            return response()->json([
-                'message' => 'Item has been restored.',
             ]);
         } catch (\Exception $exception) {
             reportLog($exception);

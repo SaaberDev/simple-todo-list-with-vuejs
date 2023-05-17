@@ -5,7 +5,7 @@ namespace App\Http\Requests\Item;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class ItemRequest extends FormRequest
+class StoreRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,18 +22,8 @@ class ItemRequest extends FormRequest
      */
     public function rules(): array
     {
-        switch ($this->method()) {
-            case 'GET':
-            case 'DELETE':
-                return [];
-            case 'PUT':
-            case 'PATCH':
-            case 'POST':
-                return [
-                    'title' => 'required|alpha_num:title'
-                ];
-            default:
-                break;
-        }
+        return [
+            'title' => 'required|alpha_num_dash'
+        ];
     }
 }

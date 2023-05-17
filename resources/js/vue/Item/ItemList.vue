@@ -15,7 +15,7 @@ export default {
     props: ['items'],
     methods: {
         async markAsDone(data) {
-            await axios.post('/my-todo-list/items/mark-as-done/' + data.id, {
+            await axios.post('/my-todo-list/mark-as-done/' + data.id, {
                 _token: csrfToken,
                 is_completed: data.isCompleted
             }).then(resp => {

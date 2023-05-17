@@ -30,17 +30,11 @@ Route::prefix('/my-todo-list')
     ->group(function () {
         // my todo list route
         Route::get('/', [ItemController::class, 'index'])->name('index');
-
-        // items routes
-        Route::prefix('/items')->name('items.')->group(function () {
-            Route::post('/store', [ItemController::class, 'store'])->name('store');
-            Route::get('/edit/{id}', [ItemController::class, 'edit'])->name('edit');
-            Route::patch('/update/{id}', [ItemController::class, 'update'])->name('update');
-            Route::delete('/destroy/{id}', [ItemController::class, 'destroy'])->name('destroy');
-            Route::post('/restore/{id}', [ItemController::class, 'restore'])->name('restore');
-            Route::post('/archived/{id}', [ItemController::class, 'archived'])->name('archived');
-            Route::post('/mark-as-done/{id}', [ItemController::class, 'markAsDone'])->name('markAsDone');
-        });
+        Route::post('/store', [ItemController::class, 'store'])->name('store');
+        Route::get('/edit/{id}', [ItemController::class, 'edit'])->name('edit');
+        Route::patch('/update/{id}', [ItemController::class, 'update'])->name('update');
+        Route::delete('/destroy/{id}', [ItemController::class, 'destroy'])->name('destroy');
+        Route::post('/mark-as-done/{id}', [ItemController::class, 'markAsDone'])->name('markAsDone');
     });
 
 Route::middleware('auth')->group(function () {

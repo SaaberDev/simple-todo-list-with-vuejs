@@ -10,10 +10,8 @@ Alpine.start();
 import { createApp } from 'vue';
 import App from './vue/App.vue';
 import $bus from './vue/EventBus';
-import router from "./routes";
 
 const app = createApp(App);
-app.use(router);
 
 app.config.globalProperties.$bus = $bus;
 app.component('App', App);

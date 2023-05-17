@@ -3,28 +3,12 @@
         <div class="ml-4 text-center">
             <h1 class="text-3xl font-bold">My Todo List</h1>
 
-            <div class="mt-8">
-                <div v-if="showArchivedList === false">
-                    <button class="border-2 border-red-500 p-2 text-red-500"
-                            @click="fetchItems('archived')"
-                    >Show Archived
-                    </button>
-                </div>
-                <div v-else>
-                    <button class="border-2 border-red-500 p-2 text-red-500"
-                            @click="fetchItems"
-                    >Back to List
-                    </button>
-                </div>
-            </div>
-
             <item-form v-on:create-new-item="storeItem($event)"></item-form>
         </div>
 
         <div class="mt-8">
             <ul>
-                <item-list :items="items"
-                ></item-list>
+                <item-list :items="items"></item-list>
             </ul>
         </div>
     </div>
@@ -46,20 +30,12 @@ export default {
     },
     data() {
         return {
-            items: [],
-            showArchivedList: false,
-            param: ''
+            items: []
         }
     },
     methods: {
-        async fetchItems(dataType) {
+        async fetchItems() {
             var URL = '/my-todo-list';
-            if (dataType === 'archived') {
-                URL = '/my-todo-list?param=archived';
-                this.showArchivedList = true;
-            } else {
-                this.showArchivedList = false;
-            }
             await axios.get(URL).then(resp => {
                 this.items = resp.data.response.data
             }).catch(xhr => {
@@ -69,13 +45,14 @@ export default {
             return this.items;
         },
         async storeItem(item) {
-            await axios.post('/my-todo-list/items/store', {
+            await axios.post('/my-todo-list/store', {
                 _token: csrfToken,
                 title: item.title
             }).then(resp => {
                 // console.log(resp)
                 if (resp.status == 200) {
                     item.title = '';
+                    item.errors = [];
                     $_toastAlert('success', resp.data.message)
                     this.fetchItems();
                 }
@@ -88,8 +65,8 @@ export default {
     created() {
         this.fetchItems();
 
-        this.$bus.$on('archive-item', async (itemId) => {
-            await axios.post('/my-todo-list/items/archived/' + itemId)
+        this.$bus.$on('delete-item', async (itemId) => {
+            await axios.delete('/my-todo-list/destroy/' + itemId)
                 .then(resp => {
                     $_toastAlert('warning', resp.data.message)
                 })
@@ -97,7 +74,7 @@ export default {
         });
 
         this.$bus.$on('update-item', async (data) => {
-            await axios.patch('/my-todo-list/items/update/' + data.item.id, {
+            await axios.patch('/my-todo-list/update/' + data.item.id, {
                 _token: csrfToken,
                 title: data.item.title
             })
@@ -107,16 +84,23 @@ export default {
                     buttons.cancelBtn = false;
                     buttons.updateBtn = false;
                     buttons.addBtn = true;
+                }).catch(xhr => {
+                    data.item.validationMessage = true
+                    data.item.errors = xhr.response.data
                 })
             await this.fetchItems();
         });
 
         this.$bus.$on('cancel-update', (data) => {
             data.item.title = '';
+            data.item.validationMessage = false
             buttons.cancelBtn = false;
             buttons.updateBtn = false;
             buttons.addBtn = true;
         });
+        buttons.cancelBtn = false;
+        buttons.updateBtn = false;
+        buttons.addBtn = true;
     }
 }
 </script>

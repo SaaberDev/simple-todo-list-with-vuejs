@@ -48,7 +48,7 @@
     </div>
 
     <div class="text-left text-red-600"
-         :class="[(item.validationMessage ? '' : 'hidden'), (item.title == '' && item.validationMessage == false  ? item.validationMessage = false : '')]"
+         :class="[(item.validationMessage ? '' : 'hidden'), (item.title === ''  ? item.validationMessage = false : '')]"
          v-text="item.errors.message"
     >
     </div>
@@ -68,15 +68,18 @@ export default {
         return {
             item: {
                 validationMessage: false,
-                errors: {},
+                errors: [],
                 title: '',
                 id: ''
             },
         }
     },
     created() {
+        if (this.item.title.empty) {
+            this.item.validationMessage = false
+        }
         this.$bus.$on('edit-item', async (itemId) => {
-            await axios.get('/my-todo-list/items/edit/' + itemId)
+            await axios.get('/my-todo-list/edit/' + itemId)
                 .then(resp => {
                     // console.log(resp.data.response.title)
                     this.item.title = resp.data.response.title

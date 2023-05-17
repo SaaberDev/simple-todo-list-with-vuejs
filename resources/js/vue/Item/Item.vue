@@ -22,11 +22,8 @@
             </div>
 
             <div class="flex justify-between" style="width: 23%;height: fit-content;">
-                <edit-btn :itemId="this.item.id"
-                ></edit-btn>
-
-                <archive-btn :itemId="this.item.id"
-                ></archive-btn>
+                <edit-btn :itemId="this.item.id"></edit-btn>
+                <delete-btn :itemId="this.item.id"></delete-btn>
             </div>
         </div>
         <hr class="mt-2"/>
@@ -34,8 +31,8 @@
 </template>
 
 <script>
-import DeleteBtn from "./ArchiveBtn.vue";
-import ArchiveBtn from "@/Item/ArchiveBtn.vue";
+import DeleteBtn from "./DeleteBtn.vue";
+import ArchiveBtn from "@/Item/DeleteBtn.vue";
 import EditBtn from "@/Item/EditBtn.vue";
 
 export default {
