@@ -9,24 +9,23 @@ use Illuminate\Http\Request;
 
 class ItemController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return view('my-todo-list');
-    }
+        if ($request->expectsJson()) {
+            $data = Item::orderBy('created_at', 'desc')->paginate(5);
 
-    public function items(Request $request)
-    {
-        $data = Item::orderBy('created_at', 'desc')->paginate(5);
+            $param = $request->get('param');
+            if ($param === 'archived') {
+                $data = Item::onlyTrashed()->orderBy('created_at', 'desc')->paginate(5);
+            }
 
-        $param = $request->get('param');
-        if ($param === 'archived') {
-            $data = Item::onlyTrashed()->orderBy('created_at', 'desc')->paginate(5);
+            return response()->json([
+                'message' => 'success',
+                'response' => $data
+            ]);
+        } else {
+            return view('my-todo-list');
         }
-
-        return response()->json([
-            'message' => 'success',
-            'response' => $data
-        ]);
     }
 
     public function store(ItemRequest $request)
@@ -49,6 +48,15 @@ class ItemController extends Controller
                 'message' => 'Oops, Something Went Wrong!'
             ]);
         }
+    }
+
+    public function edit(string $id)
+    {
+        $item = Item::findOrFail($id);
+        return response()->json([
+            'message' => 'success',
+            'response' => $item
+        ]);
     }
 
     public function update(ItemRequest $request, string $id)

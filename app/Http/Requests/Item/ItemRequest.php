@@ -30,7 +30,7 @@ class ItemRequest extends FormRequest
             case 'PATCH':
             case 'POST':
                 return [
-                    'title' => 'required'
+                    'title' => 'required|alpha_num:title'
                 ];
             default:
                 break;

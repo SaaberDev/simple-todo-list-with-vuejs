@@ -14,14 +14,14 @@ export default {
     components: {Item},
     props: ['items'],
     methods: {
-        markAsDone(data) {
-            axios.post('/my-todo-list/mark-as-done/' + data.id, {
+        async markAsDone(data) {
+            await axios.post('/my-todo-list/items/mark-as-done/' + data.id, {
                 _token: csrfToken,
                 is_completed: data.isCompleted
             }).then(resp => {
                 $_toastAlert('success', resp.data.message)
             });
         }
-    }
+    },
 }
 </script>

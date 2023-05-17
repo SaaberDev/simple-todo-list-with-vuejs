@@ -35,9 +35,15 @@
 import axios from "axios";
 import ItemForm from "./Item/ItemForm.vue";
 import ItemList from "./Item/ItemList.vue";
+import buttons from "@/buttons.js";
 
 export default {
     components: {ItemForm, ItemList},
+    computed: {
+        buttons() {
+            return buttons
+        }
+    },
     data() {
         return {
             items: [],
@@ -47,11 +53,10 @@ export default {
     },
     methods: {
         async fetchItems(dataType) {
-            var URL = '/my-todo-list/items';
+            var URL = '/my-todo-list';
             if (dataType === 'archived') {
                 URL = '/my-todo-list?param=archived';
                 this.showArchivedList = true;
-                this.$router.push({path: URL, params: {param: dataType}})
             } else {
                 this.showArchivedList = false;
             }
@@ -64,7 +69,7 @@ export default {
             return this.items;
         },
         async storeItem(item) {
-            await axios.post('/my-todo-list/store', {
+            await axios.post('/my-todo-list/items/store', {
                 _token: csrfToken,
                 title: item.title
             }).then(resp => {
@@ -75,8 +80,8 @@ export default {
                     this.fetchItems();
                 }
             }).catch(xhr => {
-                this.validationMessage = true
-                this.errors = xhr.response.data
+                item.validationMessage = true
+                item.errors = xhr.response.data
             });
         }
     },
@@ -84,11 +89,33 @@ export default {
         this.fetchItems();
 
         this.$bus.$on('archive-item', async (itemId) => {
-            await axios.post('/my-todo-list/archived/' + itemId)
+            await axios.post('/my-todo-list/items/archived/' + itemId)
                 .then(resp => {
                     $_toastAlert('warning', resp.data.message)
                 })
             await this.fetchItems();
+        });
+
+        this.$bus.$on('update-item', async (data) => {
+            await axios.patch('/my-todo-list/items/update/' + data.item.id, {
+                _token: csrfToken,
+                title: data.item.title
+            })
+                .then(resp => {
+                    data.item.title = '';
+                    $_toastAlert('success', resp.data.message)
+                    buttons.cancelBtn = false;
+                    buttons.updateBtn = false;
+                    buttons.addBtn = true;
+                })
+            await this.fetchItems();
+        });
+
+        this.$bus.$on('cancel-update', (data) => {
+            data.item.title = '';
+            buttons.cancelBtn = false;
+            buttons.updateBtn = false;
+            buttons.addBtn = true;
         });
     }
 }
