@@ -1,40 +1,34 @@
 <?php
 
-namespace App\Http\Controllers\Item;
+namespace App\Http\Controllers\Api\v1\Item;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Item\StoreRequest;
 use App\Http\Requests\Item\UpdateRequest;
 use App\Models\Item;
-use Auth;
-use DB;
 use Exception;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Contracts\View\View;
-use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
-class ItemController extends Controller
+class ItemApiController extends Controller
 {
-    public function index(Request $request): \Illuminate\Contracts\Foundation\Application|Factory|View|Application|JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        if ($request->expectsJson()) {
-            $perPage = $request->get('perPage', 5);
-            $data = Item::where('user_id', '=', Auth::id())
-                ->orderBy('created_at', 'desc')
-                ->paginate($perPage);
+        $perPage = $request->get('perPage', 5);
+        $data = Item::where('user_id', '=', Auth::id())
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage);
 
-            return response()->json([
-                'message' => 'success',
-                'response' => $data->items(),
-                'total' => $data->total(),
-                'currentPage' => $data->currentPage(),
-                'totalPages' => $data->lastPage(),
-            ]);
-        } else {
-            return view('my-todo-list');
-        }
+        return response()->json([
+            'message' => 'success',
+            'response' => $data->items(),
+            'total' => $data->total(),
+            'currentPage' => $data->currentPage(),
+            'totalPages' => $data->lastPage(),
+            'hasNextPage' => !$data->hasMorePages()
+        ]);
     }
 
     public function store(StoreRequest $request): JsonResponse

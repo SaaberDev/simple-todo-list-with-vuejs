@@ -19,18 +19,17 @@
         </div>
 
         <div class="mt-8">
-            <ul v-if="items.length > 0">
-                <item-list :items="items"></item-list>
+            <ul>
+                <item-list v-if="items.length > 0" :items="items"></item-list>
+
+                <li v-else class="my-1">No items found</li>
             </ul>
-            <div v-else>
-                <p class="my-1">No items found</p>
-            </div>
 
-            <div class="flex justify-between">
+            <div class="flex"
+                 :class="[(hasLess ? 'justify-between' : 'justify-end')]"
+            >
                 <button class="btn btn-blue" v-if="hasLess" @click="previous">Previous</button>
-                <button class="btn btn-blue" v-if="hasMore && items.length > (this.perPage - 1)" @click="next">Next</button>
-
-                <p v-else>No more items to load.</p>
+                <button class="btn btn-blue" v-if="hasMore && totalPages > 1" @click="next">Next</button>
             </div>
         </div>
     </div>
@@ -42,6 +41,7 @@ import axios from "axios";
 import ItemForm from "./Item/ItemForm.vue";
 import ItemList from "./Item/ItemList.vue";
 import buttons from "@/buttons.js";
+import {useRoute} from "vue-router";
 
 export default {
     components: {ItemForm, ItemList},
@@ -58,12 +58,13 @@ export default {
             hasMore: true,
             hasLess: false,
             totalRecords: 0,
-            totalPages: 0
+            totalPages: 0,
+            hasNextPage: false
         }
     },
     methods: {
         async fetchItems() {
-            await axios.get('/my-todo-list', {
+            await axios.get('/my-todo-list/items', {
                 params: {
                     page: this.currentPage,
                     perPage: this.perPage
@@ -73,13 +74,12 @@ export default {
                 this.totalRecords = resp.data.total;
                 this.currentPage = resp.data.currentPage;
                 this.totalPages = resp.data.totalPages;
+                this.hasNextPage = resp.data.hasNextPage;
                 if (this.currentPage === 1) {
                     this.hasMore = true;
                     this.hasLess = false;
                 }
             });
-
-            console.log(this.items)
         },
         async storeItem(item) {
             await axios.post('/my-todo-list/store', {
