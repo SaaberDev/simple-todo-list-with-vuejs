@@ -13,19 +13,16 @@ class ItemController extends Controller
     public function index(Request $request)
     {
         if ($request->expectsJson()) {
-            $page = $request->get('page') ?? 1;
-            $perPage = 5;
-            $offset = $perPage * ($page - 1);
-            $data = Item::when($page)
-                ->orderBy('created_at', 'desc')
-                ->skip($offset)
-                ->take($perPage)
-                ->get()
-            ;
+            $perPage = $request->get('perPage', 5);
+            $data = Item::orderBy('created_at', 'desc')
+                ->paginate($perPage);
 
             return response()->json([
                 'message' => 'success',
-                'response' => $data
+                'response' => $data->items(),
+                'total' => $data->total(),
+                'currentPage' => $data->currentPage(),
+                'totalPages' => $data->lastPage(),
             ]);
         } else {
             return view('my-todo-list');

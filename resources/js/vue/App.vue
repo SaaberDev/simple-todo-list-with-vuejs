@@ -20,12 +20,12 @@
 
         <div class="mt-8">
             <ul>
-                <item-list :items="items" :key="this.componentKey"></item-list>
+                <item-list :items="items"></item-list>
             </ul>
 
             <div class="flex justify-between">
                 <button class="btn btn-blue" v-if="hasLess" @click="previous">Previous</button>
-                <button class="btn btn-blue" v-if="hasMore" @click="loadMore">Load More</button>
+                <button class="btn btn-blue" v-if="hasMore" @click="next">Next</button>
 
                 <p v-else>No more items to load.</p>
             </div>
@@ -54,12 +54,26 @@ export default {
             perPage: 5,
             hasMore: true,
             hasLess: false,
+            totalRecords: 0,
+            totalPages: 0
         }
     },
     methods: {
         async fetchItems() {
-            await axios.get(`/my-todo-list?page=${this.currentPage}`).then(resp => {
+            await axios.get('/my-todo-list', {
+                params: {
+                    page: this.currentPage,
+                    perPage: this.perPage
+                }
+            }).then(resp => {
                 this.items = resp.data.response;
+                this.totalRecords = resp.data.total;
+                this.currentPage = resp.data.currentPage;
+                this.totalPages = resp.data.totalPages;
+                if (this.currentPage === 1) {
+                    this.hasMore = true;
+                    this.hasLess = false;
+                }
             });
         },
         async storeItem(item) {
@@ -72,6 +86,7 @@ export default {
                     item.title = '';
                     item.errors = [];
                     $_toastAlert('success', resp.data.message)
+                    this.currentPage = 1;
                     this.fetchItems();
                 }
             }).catch(xhr => {
@@ -79,50 +94,7 @@ export default {
                 item.errors = xhr.response.data
             });
         },
-        async loadMore() {
-            try {
-                // increment the current page
-                this.currentPage++;
-                const response = await axios.get(`/my-todo-list?page=${this.currentPage}`);
-                this.items = response.data.response;
-
-                // check if page item length is equal to per page items
-                this.hasMore = this.items.length === this.perPage;
-                // check if current page is less than 1 to show previous button
-                this.hasLess = this.currentPage > 1;
-            } catch (error) {
-                console.error('Error loading more items', error);
-            }
-        },
-        async previous() {
-            try {
-                // decrement the current page
-                this.currentPage--;
-                const response = await axios.get(`/my-todo-list?page=${this.currentPage}`);
-                this.items = response.data.response;
-
-                // check if current page is less than 1 to hide previous button
-                this.hasLess = this.currentPage > 1;
-                // check if page item length is equal to per page items
-                // if true show load more button
-                this.hasMore = this.items.length === this.perPage;
-            } catch (error) {
-                console.error('Error loading items on previous', error);
-            }
-        }
-    },
-    created() {
-        this.fetchItems();
-
-        this.$bus.$on('delete-item', async (itemId) => {
-            await axios.delete('/my-todo-list/destroy/' + itemId)
-                .then(resp => {
-                    $_toastAlert('warning', resp.data.message)
-                })
-            await this.fetchItems();
-        });
-
-        this.$bus.$on('update-item', async (data) => {
+        async updateItem(data) {
             await axios.patch('/my-todo-list/update/' + data.item.id, {
                 _token: csrfToken,
                 title: data.item.title
@@ -133,11 +105,64 @@ export default {
                     buttons.cancelBtn = false;
                     buttons.updateBtn = false;
                     buttons.addBtn = true;
+                    this.fetchItems();
                 }).catch(xhr => {
                     data.item.validationMessage = true
                     data.item.errors = xhr.response.data
                 })
-            await this.fetchItems();
+        },
+        async deleteItem(itemId) {
+            await axios.delete('/my-todo-list/destroy/' + itemId)
+                .then(resp => {
+                    $_toastAlert('warning', resp.data.message);
+                    this.fetchItems();
+                })
+        },
+        next() {
+            if (this.currentPage < this.totalPages) {
+                try {
+                    // increment the current page
+                    this.currentPage++;
+                    this.fetchItems();
+
+                    // check if current page is not equal to total page
+                    // if true show next button or hide
+                    this.hasMore = this.currentPage !== this.totalPages;
+                    // check if current page is less than 1 to show previous button
+                    this.hasLess = this.currentPage > 1;
+                } catch (error) {
+                    console.error('Error loading more items', error);
+                }
+            }
+        },
+        previous() {
+            if (this.currentPage > 1) {
+                try {
+                    // decrement the current page
+                    this.currentPage--;
+                    this.fetchItems();
+
+                    // check if current page is less than 1 to hide previous button
+                    this.hasLess = this.currentPage > 1;
+                    // check if current page is not equal to total page
+                    // if true show next button or hide
+                    this.hasMore = this.currentPage !== this.totalPages;
+                } catch (error) {
+                    console.error('Error loading items on previous', error);
+                }
+            }
+        }
+    },
+    mounted() {
+        this.fetchItems();
+    },
+    created() {
+        this.$bus.$on('update-item', (data) => {
+            this.updateItem(data);
+        });
+
+        this.$bus.$on('delete-item', (itemId) => {
+            this.deleteItem(itemId);
         });
 
         this.$bus.$on('cancel-update', (data) => {
