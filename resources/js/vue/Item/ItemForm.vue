@@ -1,5 +1,5 @@
 <template>
-    <div class="mt-4 flex">
+    <div class="mt-4 flex justify-between">
         <input class="w-80 border-b-2 border-gray-500 text-black"
                type="text"
                placeholder="Enter your task here"

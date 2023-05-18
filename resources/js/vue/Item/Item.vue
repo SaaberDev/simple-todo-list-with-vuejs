@@ -1,11 +1,11 @@
 <template>
     <li class="p-2 rounded-lg">
-        <div class="flex align-left flex-row justify-between self-center">
+        <div class="flex align-left flex-row justify-between self-center items-center">
             <div class="flex w-3/4">
-                <div class="p-2">
+                <div class="p-2 pl-0">
                     <input type="checkbox"
                            class="h-6 w-6"
-                           name="completed_at"
+                           name="status"
                            :value="1"
                            :checked="this.itemData.isCompleted"
                            v-model="this.itemData.isCompleted"
@@ -20,8 +20,13 @@
                     </p>
                 </div>
             </div>
-
-            <div class="flex justify-between" style="width: 23%;height: fit-content;">
+            <div>
+                <span class="text-sm font-medium mr-2 px-2.5 py-0.5 rounded"
+                      v-text="this.itemData.isCompleted ? 'Done' : 'Ongoing'"
+                      :class="[(this.itemData.isCompleted ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300')]"
+                ></span>
+            </div>
+            <div class="flex justify-between" style="width: 15%; height: fit-content;">
                 <edit-btn :itemId="this.item.id"></edit-btn>
                 <delete-btn :itemId="this.item.id"></delete-btn>
             </div>
@@ -42,7 +47,7 @@ export default {
         return {
             itemData: {
                 id: this.item.id,
-                isCompleted: this.item.completed_at != null
+                isCompleted: this.item.status === 1
             }
         }
     },

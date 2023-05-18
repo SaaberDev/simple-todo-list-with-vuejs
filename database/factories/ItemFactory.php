@@ -17,20 +17,11 @@ class ItemFactory extends Factory
         ];
     }
 
-    public function completedAt(): Factory
+    public function completed(): Factory
     {
         return $this->state(function () {
             return [
-                'completed_at' => now(),
-            ];
-        });
-    }
-
-    public function deletedAt(): Factory
-    {
-        return $this->state(function () {
-            return [
-                'deleted_at' => now(),
+                'status' => 1,
             ];
         });
     }

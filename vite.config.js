@@ -12,12 +12,7 @@ export default defineConfig({
             ],
             refresh: true,
         }),
-        vue({
-            transformAssetUrls: {
-                base: null,
-                includeAbsolute: false,
-            }
-        })
+        vue()
     ],
     resolve: {
         alias: {

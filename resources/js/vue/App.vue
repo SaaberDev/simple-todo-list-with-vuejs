@@ -11,21 +11,24 @@
 </style>
 
 <template>
-    <div class="bg-white p-3 max-w-md mx-auto">
-        <div class="ml-4 text-center">
+    <div class="bg-white p-3 max-w-2xl mx-auto">
+        <div class="text-center">
             <h1 class="text-3xl font-bold">My Todo List</h1>
 
             <item-form v-on:create-new-item="storeItem($event)"></item-form>
         </div>
 
         <div class="mt-8">
-            <ul>
+            <ul v-if="items.length > 0">
                 <item-list :items="items"></item-list>
             </ul>
+            <div v-else>
+                <p class="my-1">No items found</p>
+            </div>
 
             <div class="flex justify-between">
                 <button class="btn btn-blue" v-if="hasLess" @click="previous">Previous</button>
-                <button class="btn btn-blue" v-if="hasMore" @click="next">Next</button>
+                <button class="btn btn-blue" v-if="hasMore && items.length > (this.perPage - 1)" @click="next">Next</button>
 
                 <p v-else>No more items to load.</p>
             </div>
@@ -75,6 +78,8 @@ export default {
                     this.hasLess = false;
                 }
             });
+
+            console.log(this.items)
         },
         async storeItem(item) {
             await axios.post('/my-todo-list/store', {

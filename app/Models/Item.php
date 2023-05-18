@@ -12,7 +12,7 @@ class Item extends Model
 
     protected $guarded = [];
 
-    public function user(): BelongsTo
+    public function users(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
