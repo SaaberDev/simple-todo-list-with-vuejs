@@ -55,7 +55,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://todo-test.test'),
+    'url' => env('APP_URL', 'http://localhost:8000'),
     'api_url' => env('API_URL', '/api/v1'),
 
     'asset_url' => env('ASSET_URL'),
