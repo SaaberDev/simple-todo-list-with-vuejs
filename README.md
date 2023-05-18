@@ -1,5 +1,17 @@
 ### Simple Todo List Application with Authentication
 
+1. [Installation](https://github.com/SaaberDev/to-do-list-test#installation)
+   1. [Clone the project](https://github.com/SaaberDev/to-do-list-test#clone-the-project)
+   2. [Install Composer](https://github.com/SaaberDev/to-do-list-test#install-composer)
+   3. [Install NPM](https://github.com/SaaberDev/to-do-list-test#install-npm)
+   4. [Generate .env](https://github.com/SaaberDev/to-do-list-test#generate-env)
+   5. [Generate Application Key](https://github.com/SaaberDev/to-do-list-test#generate-application-key)
+   6. [Run migration](https://github.com/SaaberDev/to-do-list-test#run-migration)
+   7. [Email Configuration](https://github.com/SaaberDev/to-do-list-test#email-configuration)
+   8. [Serve the project](https://github.com/SaaberDev/to-do-list-test#serve-the-project)
+2. [Dummy Data - Optional](https://github.com/SaaberDev/to-do-list-test#dummy-data)
+   1. [Seeder](https://github.com/SaaberDev/to-do-list-test#seeder-optional)
+
 ---
 
 ### Installation guide
@@ -88,6 +100,13 @@ You can simply serve the project using this command.
 php artisan serve
 ```
 
+#### Validation Instruction
+
+There are two special validation used in title and password field.
+
+`title`: title may only contain letters, numbers, space and hyphen.
+`password`: The password must contain at least 8 characters, one uppercase and one lowercase letter, one symbol and one number.
+
 > ⚠️ **NOTE: Make sure your `APP_URL` is set to the correct url for example if project is running on localhost domain `http://localhost:8000` or `http://127.0.0.1:8000` put that value in `.env` including port number and if you are running on a custom localhost domain `http://todo.test` put the whole url as well. It is important to put the `APP_URL` currently to avoid any issue with API request authentication.**
 > If you are already running another project in the system with same port use this command to serve laravel in different port.
 > 
@@ -117,4 +136,13 @@ php artisan db:seed --class=ItemSeeder
 
 ```
 php artisan migrate:fresh --seed
+```
+
+#### Default User
+
+After running the `UserSeeder` you will by default get a demo user with same credentials.
+
+```
+Email: demo@demo.com
+Password: demo@demo.com
 ```
