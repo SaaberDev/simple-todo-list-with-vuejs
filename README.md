@@ -9,8 +9,10 @@
    6. [Run migration](https://github.com/SaaberDev/to-do-list-test#run-migration)
    7. [Email Configuration](https://github.com/SaaberDev/to-do-list-test#email-configuration)
    8. [Serve the project](https://github.com/SaaberDev/to-do-list-test#serve-the-project)
+   9. [Validation Instruction](https://github.com/SaaberDev/to-do-list-test#validation-instruction)
 2. [Dummy Data - Optional](https://github.com/SaaberDev/to-do-list-test#dummy-data)
    1. [Seeder](https://github.com/SaaberDev/to-do-list-test#seeder-optional)
+   2. [Default User](https://github.com/SaaberDev/to-do-list-test#default-user)
 
 ---
 
