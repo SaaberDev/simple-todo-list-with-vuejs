@@ -109,7 +109,7 @@ There are two special validation used in title and password field.
 `title`: title may only contain letters, numbers, space and hyphen.
 `password`: The password must contain at least 8 characters, one uppercase and one lowercase letter, one symbol and one number.
 
-> ⚠️ **NOTE: Make sure your `APP_URL` is set to the correct url for example if project is running on localhost domain `http://localhost:8000` or `http://127.0.0.1:8000` put that value in `.env` including port number and if you are running on a custom localhost domain `http://todo.test` put the whole url as well. It is important to put the `APP_URL` currently to avoid any issue with API request authentication.**
+> ⚠️ **NOTE: Make sure your `APP_URL` is set to the correct url, for example if project is running on localhost domain `http://localhost:8000` or `http://127.0.0.1:8000` put that value in `.env` including port number and if you are running on a custom localhost domain `http://todo.test` put the whole url as well. It is important to put the `APP_URL` to avoid any issue with API request authentication.**
 > If you are already running another project in the system with same port use this command to serve laravel in different port.
 > 
 >  ```
